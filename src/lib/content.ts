@@ -23,7 +23,7 @@ export type TreatmentVisual = {
   fit?: "cover" | "contain";
   /** Tailwind object-position utility, e.g. "object-top". Defaults to centered. */
   position?: string;
-  /** Aspect-ratio utility for the secondary (aside) visual only. Defaults to "aspect-[4/3]". */
+  /** Aspect-ratio utility for the visual stage. Defaults to "aspect-[4/3]" for supporting images and "aspect-[1.03]" for hero images. */
   aspectClass?: string;
   /** Optional padding override for transparent product photography optical sizing. */
   imageClassName?: string;
@@ -40,6 +40,8 @@ export type TreatmentPageData = {
   visualImage?: TreatmentVisual;
   /** Optional supporting image shown alongside the "Om behandlingen" intro text. */
   secondaryVisual?: TreatmentVisual;
+  /** Additional supporting visuals shown alongside the "Om behandlingen" intro text. */
+  supportingVisuals?: TreatmentVisual[];
   highlights?: { label: string; value: string }[];
   sections: PageSection[];
   note?: string;
@@ -239,8 +241,28 @@ export const SCARNIK_PAGE: TreatmentPageData = {
   eyebrow: "ScarNik Concept",
   title: "SCARINK – behandling av ärr",
   intro: "ScarNik Concept är ett arbetssätt för ärr där fokus ligger på hudens utseende, komfort och välbefinnande — inte enbart på att dölja förändringen.",
-  visualLabel: "ScarNik-fotografi behövs",
-  visualTone: "charcoal",
+  visualLabel: "",
+  visualTone: "ivory",
+  visualImage: {
+    src: "/images/salong-ed/scarink/scarink-treatment.webp",
+    alt: "ScarNik-behandling på Salong ED",
+    position: "object-center",
+    aspectClass: "aspect-[1.45]",
+  },
+  supportingVisuals: [
+    {
+      src: "/images/salong-ed/scarink/scarink-before-after.webp",
+      alt: "Dokumentation av hudens förändring efter ScarNik-behandling",
+      fit: "contain",
+      aspectClass: "aspect-[4/3]",
+    },
+    {
+      src: "/images/salong-ed/scarink/scarink-result-arm.webp",
+      alt: "Dokumentation av ScarNik-resultat på arm",
+      fit: "contain",
+      aspectClass: "aspect-[4/3]",
+    },
+  ],
   sections: [
     {
       title: "Vad är ScarNik Concept?",

@@ -7,6 +7,7 @@ import Container from "@/components/ui/Container";
 import BookingButton from "@/components/ui/BookingButton";
 import { ArrowDownIcon, CloseIcon, MenuIcon } from "@/components/icons";
 import { NAV_LINKS, TREATMENT_LINKS } from "@/lib/nav";
+import { ROUTES } from "@/lib/routes";
 
 const INERT_TARGET_IDS = ["site-header-bar", "main-content", "site-footer"];
 
@@ -145,9 +146,14 @@ export default function Header() {
                   </li>
                 ))}
               </ul>
+              <div className="mt-8">
+                <Link href={ROUTES.giftCard} onClick={closeMenu} className="flex min-h-12 items-center border-b border-border font-serif text-xl text-foreground transition-colors hover:text-accent">
+                  Presentkort
+                </Link>
+              </div>
               <p className="pb-2 pt-8 text-[10px] uppercase tracking-[0.2em] text-accent">Salong ED</p>
               <ul>
-                {NAV_LINKS.filter((link) => !TREATMENT_LINKS.some((treatment) => treatment.href === link.href)).map((link) => (
+                {NAV_LINKS.filter((link) => link.href !== ROUTES.giftCard && !TREATMENT_LINKS.some((treatment) => treatment.href === link.href)).map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} onClick={closeMenu} className="flex min-h-12 items-center border-b border-border font-serif text-xl text-foreground transition-colors hover:text-accent">
                       {link.label}

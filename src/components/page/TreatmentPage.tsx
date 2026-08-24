@@ -4,10 +4,10 @@ import Button from "@/components/ui/Button";
 import BookingButton from "@/components/ui/BookingButton";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
-import { absoluteUrl } from "@/lib/site";
 import type { TreatmentPageData } from "@/lib/content";
 import { TONE_BG_CLASSES } from "@/lib/tone";
 import Breadcrumbs from "@/components/page/Breadcrumbs";
+import BreadcrumbStructuredData from "@/components/page/BreadcrumbStructuredData";
 import RelatedTreatments from "@/components/page/RelatedTreatments";
 
 type TreatmentPageProps = {
@@ -15,18 +15,14 @@ type TreatmentPageProps = {
 };
 
 export default function TreatmentPage({ data }: TreatmentPageProps) {
-  const breadcrumbData = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Salong ED", item: absoluteUrl("/") },
-      { "@type": "ListItem", position: 2, name: data.title, item: absoluteUrl(data.path) },
-    ],
-  };
+  const supportingVisuals = [
+    ...(data.secondaryVisual ? [data.secondaryVisual] : []),
+    ...(data.supportingVisuals ?? []),
+  ];
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }} />
+      <BreadcrumbStructuredData current={data.title} path={data.path} />
       <section className="border-b border-border bg-surface">
         <Container>
           <div className="py-6 sm:py-8"><Breadcrumbs current={data.title} /></div>
@@ -46,7 +42,7 @@ export default function TreatmentPage({ data }: TreatmentPageProps) {
             <div className="lg:pl-8">
               {data.visualImage ? (
                 <div
-                  className={`relative aspect-[1.03] w-full overflow-hidden border border-border ${
+                  className={`relative ${data.visualImage.aspectClass ?? "aspect-[1.03]"} w-full overflow-hidden border border-border ${
                     data.visualImage.fit === "contain" ? TONE_BG_CLASSES[data.visualTone] : ""
                   }`}
                 >
@@ -90,17 +86,22 @@ export default function TreatmentPage({ data }: TreatmentPageProps) {
             <span className="text-[10px] uppercase tracking-[0.22em] text-accent">Om behandlingen</span>
             <h2 className="text-balance mt-4 font-serif text-3xl leading-tight text-foreground sm:text-4xl">Tydlig information. Personligt upplägg.</h2>
             <p className="mt-5 text-sm leading-7 text-muted">Läs om behandlingens inriktning och boka en tid när du vill gå vidare.</p>
-            {data.secondaryVisual && (
-              <div className={`relative mt-8 w-full overflow-hidden border border-border ${data.secondaryVisual.aspectClass ?? "aspect-[4/3]"}`}>
+            {supportingVisuals.map((visual) => (
+              <div
+                key={visual.src}
+                className={`relative mt-8 w-full overflow-hidden border border-border ${visual.aspectClass ?? "aspect-[4/3]"} ${
+                  visual.fit === "contain" ? TONE_BG_CLASSES[data.visualTone] : "bg-surface-muted"
+                }`}
+              >
                 <Image
-                  src={data.secondaryVisual.src}
-                  alt={data.secondaryVisual.alt}
+                  src={visual.src}
+                  alt={visual.alt}
                   fill
                   sizes="(min-width: 1024px) 30vw, 90vw"
-                  className={`object-cover ${data.secondaryVisual.position ?? ""}`}
+                  className={visual.fit === "contain" ? "object-contain p-2 sm:p-3" : `object-cover ${visual.position ?? ""}`}
                 />
               </div>
-            )}
+            ))}
           </aside>
 
           <div className="border-t border-border">

@@ -4,6 +4,7 @@ export type NavLink = {
 };
 
 export const NAV_LINKS: NavLink[] = [
+  { label: "Presentkort", href: "/skönhet-presentkort-ursvik" },
   { label: "Ansikte", href: "/ansiktsbehandlingar" },
   { label: "Kropp", href: "/kroppsbehandlingar" },
   { label: "Icoone LaserMed", href: "/icoone-lasermed-sundbyberg-ursvik" },
@@ -19,6 +20,5 @@ export const TREATMENT_LINKS: NavLink[] = [
   { label: "Fransar & naglar", href: "/fransar-naglar-ursvik" },
   { label: "Icoone LaserMed", href: "/icoone-lasermed-sundbyberg-ursvik" },
   { label: "Exilis Ultra 360", href: "/exilis-ultra-360-ursvik" },
-  { label: "Presentkort", href: "/skönhet-presentkort-ursvik" },
   { label: "ScarNik Scar", href: "/scarnik-scar" },
 ];

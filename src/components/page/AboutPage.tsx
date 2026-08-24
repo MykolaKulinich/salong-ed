@@ -2,6 +2,7 @@ import Image from "next/image";
 import Container from "@/components/ui/Container";
 import BookingButton from "@/components/ui/BookingButton";
 import Breadcrumbs from "@/components/page/Breadcrumbs";
+import BreadcrumbStructuredData from "@/components/page/BreadcrumbStructuredData";
 import RelatedTreatments from "@/components/page/RelatedTreatments";
 import { ROUTES } from "@/lib/routes";
 
@@ -14,6 +15,7 @@ const BACKGROUND = [
 export default function AboutPage() {
   return (
     <>
+      <BreadcrumbStructuredData current="Om Salong ED" path={ROUTES.about} />
       <section className="border-b border-border bg-surface">
         <Container>
           <div className="py-6 sm:py-8"><Breadcrumbs current="Om Salong ED" /></div>
