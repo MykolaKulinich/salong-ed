@@ -2,6 +2,7 @@ import Link from "next/link";
 import SalongEdLogo from "@/components/brand/SalongEdLogo";
 import Container from "@/components/ui/Container";
 import BookingButton from "@/components/ui/BookingButton";
+import ContactLink from "@/components/ui/ContactLink";
 import { LocationIcon, MailIcon, PhoneIcon } from "@/components/icons";
 import { CONTACT, OPENING_HOURS } from "@/lib/site";
 import { TREATMENT_LINKS } from "@/lib/nav";
@@ -37,16 +38,16 @@ export default function Footer() {
               <span>{CONTACT.address}</span>
             </li>
             <li>
-              <a href={CONTACT.phoneHref} className="flex items-center gap-2.5 transition-colors hover:text-accent">
+              <ContactLink kind="phone" href={CONTACT.phoneHref} className="flex items-center gap-2.5 transition-colors hover:text-accent">
                 <PhoneIcon className="h-4 w-4 shrink-0 text-accent" />
                 <span>{CONTACT.phone}</span>
-              </a>
+              </ContactLink>
             </li>
             <li>
-              <a href={CONTACT.emailHref} className="flex items-center gap-2.5 break-all transition-colors hover:text-accent">
+              <ContactLink kind="email" href={CONTACT.emailHref} className="flex items-center gap-2.5 break-all transition-colors hover:text-accent">
                 <MailIcon className="h-4 w-4 shrink-0 text-accent" />
                 <span>{CONTACT.email}</span>
-              </a>
+              </ContactLink>
             </li>
           </ul>
         </div>

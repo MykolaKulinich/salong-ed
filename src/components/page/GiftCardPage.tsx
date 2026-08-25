@@ -1,7 +1,9 @@
 import Container from "@/components/ui/Container";
-import Button from "@/components/ui/Button";
+import ContactLink from "@/components/ui/ContactLink";
 import Breadcrumbs from "@/components/page/Breadcrumbs";
 import BreadcrumbStructuredData from "@/components/page/BreadcrumbStructuredData";
+import PresentkortOrderButton from "@/components/page/PresentkortOrderButton";
+import PresentkortViewTracker from "@/components/page/PresentkortViewTracker";
 import RelatedTreatments from "@/components/page/RelatedTreatments";
 import { ROUTES } from "@/lib/routes";
 import { CONTACT } from "@/lib/site";
@@ -30,6 +32,7 @@ export default function GiftCardPage() {
   return (
     <>
       <BreadcrumbStructuredData current="Presentkort" path={ROUTES.giftCard} />
+      <PresentkortViewTracker />
 
       <section className="border-b border-border bg-surface">
         <Container>
@@ -54,13 +57,14 @@ export default function GiftCardPage() {
                 Presentkortet kan anpassas efter önskat belopp eller behandling och passar för exempelvis ansiktsbehandlingar, kroppsbehandlingar, fransar och naglar.
               </p>
               <div className="mt-9 flex flex-wrap gap-4">
-                <Button href="#bestall-presentkort">Beställ presentkort</Button>
-                <a
+                <PresentkortOrderButton />
+                <ContactLink
+                  kind="phone"
                   href={CONTACT.phoneHref}
                   className="inline-flex min-h-12 items-center border-b border-accent px-1 text-sm font-medium text-foreground transition-colors hover:text-accent"
                 >
                   Kontakta Salong ED
-                </a>
+                </ContactLink>
               </div>
             </div>
 
@@ -137,13 +141,13 @@ export default function GiftCardPage() {
             <h2 className="mt-3 font-serif text-3xl sm:text-4xl">Beställ ditt presentkort</h2>
             <p className="mt-4 max-w-xl text-background/75">Kontakta Salong ED så hjälper vi dig att skapa ett presentkort som passar.</p>
             <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-              <a href={CONTACT.phoneHref} className="underline decoration-accent/60 underline-offset-4 transition-colors hover:text-accent">{CONTACT.phone}</a>
-              <a href={CONTACT.emailHref} className="break-all underline decoration-accent/60 underline-offset-4 transition-colors hover:text-accent">{CONTACT.email}</a>
+              <ContactLink kind="phone" href={CONTACT.phoneHref} className="underline decoration-accent/60 underline-offset-4 transition-colors hover:text-accent">{CONTACT.phone}</ContactLink>
+              <ContactLink kind="email" href={CONTACT.emailHref} className="break-all underline decoration-accent/60 underline-offset-4 transition-colors hover:text-accent">{CONTACT.email}</ContactLink>
             </div>
           </div>
-          <a href={CONTACT.phoneHref} className="inline-flex min-h-12 shrink-0 items-center justify-center border border-accent px-6 text-sm font-medium text-background transition-colors hover:bg-accent hover:text-foreground">
+          <ContactLink kind="phone" href={CONTACT.phoneHref} className="inline-flex min-h-12 shrink-0 items-center justify-center border border-accent px-6 text-sm font-medium text-background transition-colors hover:bg-accent hover:text-foreground">
             Kontakta Salong ED
-          </a>
+          </ContactLink>
         </Container>
       </section>
 

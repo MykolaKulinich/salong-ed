@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import SalongEdLogo from "@/components/brand/SalongEdLogo";
 import Container from "@/components/ui/Container";
 import BookingButton from "@/components/ui/BookingButton";
@@ -12,6 +13,7 @@ import { ROUTES } from "@/lib/routes";
 const INERT_TARGET_IDS = ["site-header-bar", "main-content", "site-footer"];
 
 export default function Header() {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTreatmentMenuOpen, setIsTreatmentMenuOpen] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -52,10 +54,22 @@ export default function Header() {
     menuButtonRef.current?.focus();
   }
 
+  function handleLogoClick(event: MouseEvent<HTMLAnchorElement>) {
+    if (pathname === "/") {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  function handleMobileLogoClick(event: MouseEvent<HTMLAnchorElement>) {
+    closeMenu();
+    handleLogoClick(event);
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
       <Container id="site-header-bar" className="flex h-[4.5rem] !max-w-none items-center justify-between gap-4 px-5 sm:px-6 lg:h-20 lg:!px-12">
-        <Link href="/" className="shrink-0" aria-label="Salong ED – till startsidan">
+        <Link href="/" onClick={handleLogoClick} className="shrink-0" aria-label="Salong ED – till startsidan">
           <span className="lg:hidden"><SalongEdLogo compact /></span>
           <span className="hidden lg:inline-flex"><SalongEdLogo /></span>
         </Link>
@@ -126,7 +140,7 @@ export default function Header() {
       {isMenuOpen && (
         <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Meny" className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background lg:hidden">
           <Container className="flex h-[4.5rem] items-center justify-between">
-            <Link href="/" onClick={closeMenu} aria-label="Salong ED – till startsidan">
+            <Link href="/" onClick={handleMobileLogoClick} aria-label="Salong ED – till startsidan">
               <SalongEdLogo compact />
             </Link>
             <button ref={closeButtonRef} type="button" aria-label="Stäng meny" onClick={closeMenu} className="inline-flex h-10 w-10 items-center justify-center text-foreground">
