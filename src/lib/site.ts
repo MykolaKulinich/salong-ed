@@ -18,8 +18,8 @@ export const CONTACT = {
 } as const;
 
 export const OPENING_HOURS = [
-  { day: "Måndag–fredag", hours: "09.00–18.00" },
-  { day: "Lördag", hours: "10.00–16.00" },
+  { day: "Måndag–fredag", hours: "09.00–19.00" },
+  { day: "Lördag", hours: "09.00–16.00" },
   { day: "Söndag", hours: "Stängt" },
 ] as const;
 

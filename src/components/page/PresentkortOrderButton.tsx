@@ -3,14 +3,11 @@
 import Button from "@/components/ui/Button";
 import { trackEvent } from "@/lib/analytics";
 
-/**
- * Same primary CTA as before (href, label, styling all unchanged) — this
- * wrapper only adds the presentkort_start click event.
- */
+/** Primary hero CTA for the configurator. */
 export default function PresentkortOrderButton() {
   return (
-    <Button href="#bestall-presentkort" onClick={() => trackEvent("presentkort_start")}>
-      Beställ presentkort
+    <Button href="#presentkort-configurator" onClick={() => trackEvent("presentkort_start")}>
+      Skapa presentkort
     </Button>
   );
 }
