@@ -23,6 +23,16 @@ export const GIFT_CARD_STATUSES = [
 ] as const;
 export type GiftCardStatus = (typeof GIFT_CARD_STATUSES)[number];
 
+/** Swedish labels for the admin UI. The underlying database values never change. */
+export const GIFT_CARD_STATUS_LABELS: Record<GiftCardStatus, string> = {
+  waiting_payment: "Väntar på betalning",
+  paid: "Betald",
+  delivered: "Skickad",
+  cancelled: "Avbruten",
+  delivery_failed: "Leverans misslyckades",
+  contacted: "Kontaktad",
+};
+
 export type GiftCardOrderForDelivery = {
   order_reference: string;
   amount: number;

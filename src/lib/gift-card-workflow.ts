@@ -7,29 +7,58 @@ import {
 import { sendGiftCardEmail } from "@/lib/gift-card-email";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 
+export type MarkPaidResult =
+  | { ok: true; status: "paid"; orderReference: string; paidAt: string }
+  | { ok: false; status: "not_waiting_payment" };
+
+/**
+ * The admin "Bekräfta betalning" action calls only this: a compare-and-set
+ * waiting_payment -> paid transition. It never touches delivery, so it's
+ * safe to expose to an authenticated admin action on its own.
+ *
+ * The conditional `.eq("status", "waiting_payment")` makes a double click,
+ * refresh, or duplicate request safe — only one call can ever win the
+ * transition; every other call sees not_waiting_payment and does nothing.
+ */
+export async function markGiftCardOrderPaid(orderId: string): Promise<MarkPaidResult> {
+  const paidAt = new Date().toISOString();
+  const { data, error } = await getSupabaseAdmin()
+    .from("gift_card_orders")
+    .update({ status: "paid", paid_at: paidAt })
+    .eq("id", orderId)
+    .eq("status", "waiting_payment")
+    .select("order_reference")
+    .maybeSingle();
+
+  if (error) throw new Error("Could not confirm gift-card payment.");
+  if (!data) return { ok: false, status: "not_waiting_payment" };
+
+  return { ok: true, status: "paid", orderReference: data.order_reference as string, paidAt };
+}
+
 export type PaymentConfirmationResult =
   | { ok: true; status: "delivered"; orderReference: string }
   | { ok: false; status: "not_waiting_payment" | "delivery_failed"; orderReference?: string };
 
 /**
- * Future authenticated admin action entry point.
- *
- * The compare-and-set update makes a double click safe: only an order still in
- * waiting_payment can be confirmed. No route exposes this function today.
+ * Future full paid -> delivered orchestration. Not called by the admin
+ * "Bekräfta betalning" action today — that action stops at
+ * markGiftCardOrderPaid() on purpose, leaving delivery for the next project
+ * step. No route exposes this function yet.
  */
 export async function confirmGiftCardPayment(orderId: string): Promise<PaymentConfirmationResult> {
   const supabase = getSupabaseAdmin();
-  const paidAt = new Date().toISOString();
-  const { data: paidOrder, error: paymentError } = await supabase
+  const paymentResult = await markGiftCardOrderPaid(orderId);
+  if (!paymentResult.ok) return { ok: false, status: "not_waiting_payment" };
+
+  const { data: paidOrder, error: fetchError } = await supabase
     .from("gift_card_orders")
-    .update({ status: "paid", paid_at: paidAt })
-    .eq("id", orderId)
-    .eq("status", "waiting_payment")
     .select("*")
+    .eq("id", orderId)
+    .eq("status", "paid")
     .maybeSingle();
 
-  if (paymentError) throw new Error("Could not confirm gift-card payment.");
-  if (!paidOrder) return { ok: false, status: "not_waiting_payment" };
+  if (fetchError || !paidOrder) throw new Error("Could not load gift-card order after payment.");
 
   const order = paidOrder as unknown as GiftCardOrderForDelivery;
   const deliveryEmail = order.delivery_target === "recipient"

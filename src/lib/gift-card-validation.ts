@@ -24,7 +24,8 @@ export type GiftCardFieldName =
   | "recipientEmail"
   | "website";
 
-export type GiftCardOrderInsert = {
+/** The order fields shared by every write path — the public submission and the admin edit. */
+export type GiftCardOrderFields = {
   amount: number;
   requested_treatment: string | null;
   recipient_name: string | null;
@@ -34,13 +35,9 @@ export type GiftCardOrderInsert = {
   customer_phone: string;
   delivery_target: GiftCardDeliveryTarget;
   recipient_email: string | null;
-  status: "waiting_payment";
 };
 
-export type GiftCardValidationSuccess = {
-  success: true;
-  data: GiftCardOrderInsert;
-};
+export type GiftCardOrderInsert = GiftCardOrderFields & { status: "waiting_payment" };
 
 export type GiftCardValidationFailure = {
   success: false;
@@ -48,7 +45,13 @@ export type GiftCardValidationFailure = {
   fieldErrors: Partial<Record<GiftCardFieldName, string>>;
 };
 
-export type GiftCardValidationResult = GiftCardValidationSuccess | GiftCardValidationFailure;
+export type GiftCardFieldsValidationResult =
+  | { success: true; data: GiftCardOrderFields }
+  | GiftCardValidationFailure;
+
+export type GiftCardValidationResult =
+  | { success: true; data: GiftCardOrderInsert }
+  | GiftCardValidationFailure;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -92,13 +95,14 @@ function parseAmount(value: unknown): number | null {
   return null;
 }
 
-export function validateGiftCardSubmission(input: unknown): GiftCardValidationResult {
+/**
+ * Validates every order field except the public-form honeypot and the
+ * `status` it forces on creation. Shared by the public submission endpoint
+ * and the admin edit action so the two never drift apart — see
+ * validateGiftCardSubmission below for the public entry point.
+ */
+export function validateGiftCardFields(input: unknown): GiftCardFieldsValidationResult {
   if (!isRecord(input)) return invalid({ amount: "Ange ett belopp." });
-
-  const website = readString(input, "website");
-  if (website === null || website.length > MAX_HONEYPOT_LENGTH || website.trim() !== "") {
-    return invalid({ website: "Ogiltig förfrågan." });
-  }
 
   const amount = parseAmount(input.amount);
   if (amount === null || amount < MIN_GIFT_CARD_AMOUNT || amount > MAX_GIFT_CARD_AMOUNT) {
@@ -187,7 +191,21 @@ export function validateGiftCardSubmission(input: unknown): GiftCardValidationRe
       customer_phone: customerPhone,
       delivery_target: deliveryTarget,
       recipient_email: deliveryTarget === "recipient" ? recipientEmail : null,
-      status: "waiting_payment",
     },
   };
+}
+
+/** Public configurator entry point: honeypot check, then the shared field validation above. */
+export function validateGiftCardSubmission(input: unknown): GiftCardValidationResult {
+  if (!isRecord(input)) return invalid({ amount: "Ange ett belopp." });
+
+  const website = readString(input, "website");
+  if (website === null || website.length > MAX_HONEYPOT_LENGTH || website.trim() !== "") {
+    return invalid({ website: "Ogiltig förfrågan." });
+  }
+
+  const fields = validateGiftCardFields(input);
+  if (!fields.success) return fields;
+
+  return { success: true, data: { ...fields.data, status: "waiting_payment" } };
 }
