@@ -2,39 +2,41 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { confirmGiftCardPaymentAction } from "../actions";
+import { resendGiftCardOrderDeliveryAction } from "../actions";
 
-export default function ConfirmPaymentForm({ orderId }: { orderId: string }) {
+/**
+ * "Skicka igen" for an already-delivered order — requires the explicit
+ * confirmation step AGENTS.md section 23 asks for, since this intentionally
+ * re-sends a gift card that already went out successfully.
+ */
+export default function ResendDeliveryButton({ orderId }: { orderId: string }) {
   const router = useRouter();
   const [step, setStep] = useState<"idle" | "confirming">("idle");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  function handleConfirm() {
+  function handleResend() {
     setError(null);
     startTransition(async () => {
-      const result = await confirmGiftCardPaymentAction(orderId);
+      const result = await resendGiftCardOrderDeliveryAction(orderId);
       if (!result.ok) {
         setError(result.error);
         setStep("idle");
         return;
       }
-      // Payment is confirmed either way; the order's own status badge and
-      // next action (Skickad / Försök skicka igen) communicate whether the
-      // automatic delivery that just ran succeeded — see AGENTS.md section 30.
       router.refresh();
     });
   }
 
   if (step === "idle") {
     return (
-      <div className="mt-8">
+      <div>
         <button
           type="button"
           onClick={() => setStep("confirming")}
-          className="min-h-12 w-full bg-foreground px-6 text-sm font-medium text-background transition-colors hover:bg-accent-strong sm:w-auto"
+          className="min-h-11 border border-border px-5 text-sm text-foreground transition-colors hover:border-foreground"
         >
-          Bekräfta betalning
+          Skicka igen
         </button>
         {error && (
           <p role="alert" className="mt-3 text-sm text-accent-strong">
@@ -46,8 +48,8 @@ export default function ConfirmPaymentForm({ orderId }: { orderId: string }) {
   }
 
   return (
-    <div className="mt-8 border border-accent/50 bg-[#f5eee5] p-5">
-      <p className="text-sm text-foreground">Har du kontrollerat att betalningen har kommit in?</p>
+    <div className="border border-accent/50 bg-[#f5eee5] p-5">
+      <p className="text-sm text-foreground">Vill du skicka presentkortet igen?</p>
       <div className="mt-4 flex flex-wrap gap-3">
         <button
           type="button"
@@ -59,11 +61,11 @@ export default function ConfirmPaymentForm({ orderId }: { orderId: string }) {
         </button>
         <button
           type="button"
-          onClick={handleConfirm}
+          onClick={handleResend}
           disabled={isPending}
           className="min-h-11 bg-foreground px-5 text-sm font-medium text-background transition-colors hover:bg-accent-strong disabled:opacity-60"
         >
-          {isPending ? "Bekräftar…" : "Bekräfta betalning"}
+          {isPending ? "Skickar…" : "Skicka igen"}
         </button>
       </div>
       {error && (

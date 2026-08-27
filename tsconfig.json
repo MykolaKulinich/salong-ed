@@ -6,6 +6,13 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    // A few src/lib files (gift-card-pdf.ts, gift-card-email-template.ts,
+    // salong-ed-logo-geometry.ts) use relative ".ts"-suffixed imports
+    // between themselves so developer scripts can run them directly under
+    // plain Node (which needs an explicit extension), outside Next.js.
+    // Safe only alongside noEmit — nothing is ever actually emitted with a
+    // literal ".ts" extension.
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

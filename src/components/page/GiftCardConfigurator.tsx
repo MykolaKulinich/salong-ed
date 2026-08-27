@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, type ReactNode, useMemo, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import {
@@ -119,6 +119,39 @@ export default function GiftCardConfigurator() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
   const [successReference, setSuccessReference] = useState<string | null>(null);
+  // Bumped only by handleReset, below — the trigger for the "scroll back to
+  // the top of the configurator" effect. Deliberately not derived from
+  // `status` alone: status also returns to "idle" after a failed
+  // submission, and that must never trigger this scroll.
+  const [resetSignal, setResetSignal] = useState(0);
+
+  const successPanelRef = useRef<HTMLDivElement>(null);
+  const configuratorSectionRef = useRef<HTMLElement>(null);
+
+  // Bug fix: after a successful submission, React swaps this section's
+  // content in place (same #presentkort-configurator element) — no
+  // navigation or hash change occurs, so the browser never re-scrolls on
+  // its own. Since the success panel is much shorter than the multi-step
+  // form the customer was just filling in, they were left wherever their
+  // scroll position happened to be, often below the confirmation entirely.
+  // Runs only on an actual idle -> success transition (never on mount,
+  // never on a validation/API failure, which sets status back to "idle").
+  useEffect(() => {
+    if (status !== "success") return;
+    const panel = successPanelRef.current;
+    if (!panel) return;
+
+    panel.scrollIntoView({ block: "start" });
+    panel.focus({ preventScroll: true });
+  }, [status]);
+
+  // After "Beställ ett nytt presentkort", bring the customer back to the
+  // top of the now-reset configurator rather than leaving them at whatever
+  // scroll position the (much shorter) success panel had.
+  useEffect(() => {
+    if (resetSignal === 0) return;
+    configuratorSectionRef.current?.scrollIntoView({ block: "start" });
+  }, [resetSignal]);
 
   const selectedAmount = useMemo(
     () => (amountSelection === "custom" ? parseCustomAmount(customAmount) : amountSelection),
@@ -200,11 +233,41 @@ export default function GiftCardConfigurator() {
     }
   }
 
+  /**
+   * "Beställ ett nytt presentkort": a pure client-side reset back to a
+   * clean new-order state. No API call, no effect on the order that was
+   * just placed — that row already exists in the database and is never
+   * touched by this. Mirrors every useState initializer above exactly.
+   */
+  function handleReset() {
+    setAmountSelection(1000);
+    setCustomAmount("");
+    setRequestedTreatment("");
+    setRecipientName("");
+    setMessage("");
+    setDeliveryTarget("customer");
+    setRecipientEmail("");
+    setCustomerName("");
+    setCustomerEmail("");
+    setCustomerPhone("");
+    setWebsite("");
+    setErrors({});
+    setSubmitError(null);
+    setSuccessReference(null);
+    setStatus("idle");
+    setResetSignal((count) => count + 1);
+  }
+
   if (status === "success") {
     return (
       <section id="presentkort-configurator" className="configurator-surface scroll-mt-28 border-y border-border py-16 sm:py-20 md:py-28">
         <Container>
-          <div className="gift-summary-card mx-auto max-w-2xl border border-accent/45 bg-background p-8 shadow-[0_35px_70px_-40px_rgba(76,58,34,0.4)] sm:p-14">
+          <div
+            ref={successPanelRef}
+            tabIndex={-1}
+            aria-label="Beställning mottagen – Tack för din beställning"
+            className="gift-summary-card mx-auto max-w-2xl scroll-mt-28 border border-accent/45 bg-background p-8 shadow-[0_35px_70px_-40px_rgba(76,58,34,0.4)] sm:p-14"
+          >
             <span className="text-[10px] uppercase tracking-[0.22em] text-accent">Beställning mottagen</span>
             <h2 className="mt-4 font-serif text-4xl leading-tight text-foreground sm:text-5xl">Tack för din beställning</h2>
             <p className="mt-6 max-w-xl text-muted">
@@ -217,7 +280,12 @@ export default function GiftCardConfigurator() {
             <p className="mt-5 text-sm leading-relaxed text-muted">
               Spara gärna numret. Det används som referens i vår fortsatta kontakt om betalning och leverans.
             </p>
-            <div className="mt-8 flex flex-wrap gap-5 text-sm">
+            <div className="mt-8">
+              <Button type="button" onClick={handleReset} className="min-h-12 w-full rounded-none sm:w-auto">
+                Beställ ett nytt presentkort
+              </Button>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-5 text-sm">
               <Link href={ROUTES.home} className="inline-flex min-h-12 items-center border border-foreground px-5 font-medium text-foreground transition-colors hover:bg-foreground hover:text-background">
                 Till startsidan
               </Link>
@@ -232,7 +300,11 @@ export default function GiftCardConfigurator() {
   }
 
   return (
-    <section id="presentkort-configurator" className="configurator-surface scroll-mt-28 border-y border-border py-16 sm:py-20 md:py-28">
+    <section
+      ref={configuratorSectionRef}
+      id="presentkort-configurator"
+      className="configurator-surface scroll-mt-28 border-y border-border py-16 sm:py-20 md:py-28"
+    >
       <Container className="grid min-w-0 gap-12 lg:grid-cols-[minmax(0,1.65fr)_minmax(19rem,0.82fr)] lg:items-start lg:gap-20">
         <div className="min-w-0">
           <div className="max-w-2xl">

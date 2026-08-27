@@ -3,23 +3,31 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdminUser } from "@/lib/admin-auth";
-import { markGiftCardOrderPaid } from "@/lib/gift-card-workflow";
+import {
+  confirmGiftCardPaymentAndDeliver,
+  resendGiftCardOrderDelivery,
+  retryGiftCardOrderDelivery,
+  sendGiftCardOrderDelivery,
+  type DeliveryOutcome,
+} from "@/lib/gift-card-workflow";
 import { getGiftCardOrderById, isValidOrderId } from "@/lib/gift-card-orders";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 import { validateGiftCardFields, type GiftCardFieldName } from "@/lib/gift-card-validation";
 import type { GiftCardStatus } from "@/lib/gift-card";
 
-export type ConfirmPaymentResult =
-  | { ok: true; orderReference: string }
-  | { ok: false; error: string };
+export type ConfirmPaymentResult = { ok: true } | { ok: false; error: string };
 
 /**
  * The only server-side entry point for "Bekräfta betalning". Re-verifies
  * auth + admin authorization itself (a page-level check does not extend to
  * a Server Action — see Next.js data-security guide), validates the id
- * shape, then delegates the actual compare-and-set update to
- * markGiftCardOrderPaid(). Stops there on purpose: no email, no PDF, no
- * status other than paid, no delivered_at. See AGENTS.md sections 14–16.
+ * shape, then delegates to confirmGiftCardPaymentAndDeliver(): the
+ * waiting_payment -> paid compare-and-set, and — only for the request that
+ * actually won that transition — one automatic delivery attempt (PDF +
+ * email through Brevo). Either outcome (delivered or delivery_failed) is
+ * reported back as `ok: true` here, since the payment confirmation itself
+ * succeeded either way; the client refreshes and the order's own status
+ * badge and next action communicate which one happened.
  */
 export async function confirmGiftCardPaymentAction(orderId: string): Promise<ConfirmPaymentResult> {
   await requireAdminUser();
@@ -28,7 +36,7 @@ export async function confirmGiftCardPaymentAction(orderId: string): Promise<Con
     return { ok: false, error: "Ogiltig beställning." };
   }
 
-  const result = await markGiftCardOrderPaid(orderId);
+  const result = await confirmGiftCardPaymentAndDeliver(orderId);
 
   if (!result.ok) {
     return {
@@ -40,7 +48,53 @@ export async function confirmGiftCardPaymentAction(orderId: string): Promise<Con
   revalidatePath("/admin/presentkort");
   revalidatePath(`/admin/presentkort/${orderId}`);
 
-  return { ok: true, orderReference: result.orderReference };
+  return { ok: true };
+}
+
+export type DeliveryActionResult = { ok: true } | { ok: false; error: string };
+
+function deliveryFailureMessage(outcome: Extract<DeliveryOutcome, { ok: false }>): string {
+  if (outcome.status === "not_eligible") {
+    return "Beställningen är inte längre i rätt läge för det här. Ladda om sidan och försök igen.";
+  }
+  return "Betalningen är bekräftad, men presentkortet kunde inte skickas.";
+}
+
+async function runDeliveryAction(
+  orderId: string,
+  deliver: (orderId: string) => Promise<DeliveryOutcome>,
+): Promise<DeliveryActionResult> {
+  await requireAdminUser();
+
+  if (!isValidOrderId(orderId)) {
+    return { ok: false, error: "Ogiltig beställning." };
+  }
+
+  const outcome = await deliver(orderId);
+
+  revalidatePath("/admin/presentkort");
+  revalidatePath(`/admin/presentkort/${orderId}`);
+
+  if (!outcome.ok) {
+    return { ok: false, error: deliveryFailureMessage(outcome) };
+  }
+
+  return { ok: true };
+}
+
+/** "Skicka presentkort" — manual recovery for a paid order that was never delivered. */
+export async function sendGiftCardOrderDeliveryAction(orderId: string): Promise<DeliveryActionResult> {
+  return runDeliveryAction(orderId, sendGiftCardOrderDelivery);
+}
+
+/** "Försök skicka igen" — retries a delivery_failed order. */
+export async function retryGiftCardOrderDeliveryAction(orderId: string): Promise<DeliveryActionResult> {
+  return runDeliveryAction(orderId, retryGiftCardOrderDelivery);
+}
+
+/** "Skicka igen" — an intentional resend of an already-delivered order. */
+export async function resendGiftCardOrderDeliveryAction(orderId: string): Promise<DeliveryActionResult> {
+  return runDeliveryAction(orderId, resendGiftCardOrderDelivery);
 }
 
 // Editing is meant for correcting a mistake on an order still in play, not

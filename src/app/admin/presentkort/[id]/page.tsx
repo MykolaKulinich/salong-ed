@@ -4,9 +4,12 @@ import { notFound } from "next/navigation";
 import { formatGiftCardAmount, GIFT_CARD_STATUS_LABELS } from "@/lib/gift-card";
 import { formatDeliveryDestination, formatOrderDateTime } from "@/lib/admin-format";
 import { getGiftCardOrderById } from "@/lib/gift-card-orders";
+import { retryGiftCardOrderDeliveryAction, sendGiftCardOrderDeliveryAction } from "../actions";
 import { STATUS_BADGE_CLASS } from "../status-styles";
 import ConfirmPaymentForm from "./ConfirmPaymentForm";
 import CancelOrderButton from "./CancelOrderButton";
+import SendDeliveryButton from "./SendDeliveryButton";
+import ResendDeliveryButton from "./ResendDeliveryButton";
 
 export const metadata: Metadata = {
   title: "Beställning",
@@ -33,6 +36,10 @@ export default async function PresentkortOrderPage({
     { label: "Mottagare", value: order.recipient_name ?? "Inte angivet" },
     { label: "Leverans", value: formatDeliveryDestination(order) },
   ];
+
+  if (order.delivered_at) {
+    fields.push({ label: "Skickad", value: formatOrderDateTime(order.delivered_at) });
+  }
 
   return (
     <div className="max-w-2xl">
@@ -83,15 +90,37 @@ export default async function PresentkortOrderPage({
         </div>
       )}
 
-      {order.status === "cancelled" && (
-        <p className="mt-8 border border-border bg-surface-muted px-4 py-3 text-sm text-muted">
-          Den här beställningen är avbruten och är skrivskyddad.
-        </p>
+      {order.status === "paid" && (
+        <div className="mt-4">
+          <SendDeliveryButton
+            orderId={order.id}
+            label="Skicka presentkort"
+            pendingLabel="Skickar…"
+            action={sendGiftCardOrderDeliveryAction}
+          />
+        </div>
+      )}
+
+      {order.status === "delivery_failed" && (
+        <div className="mt-8">
+          <SendDeliveryButton
+            orderId={order.id}
+            label="Försök skicka igen"
+            pendingLabel="Skickar…"
+            action={retryGiftCardOrderDeliveryAction}
+          />
+        </div>
       )}
 
       {order.status === "delivered" && (
+        <div className="mt-8">
+          <ResendDeliveryButton orderId={order.id} />
+        </div>
+      )}
+
+      {order.status === "cancelled" && (
         <p className="mt-8 border border-border bg-surface-muted px-4 py-3 text-sm text-muted">
-          Presentkortet är skickat och beställningen är skrivskyddad.
+          Den här beställningen är avbruten och är skrivskyddad.
         </p>
       )}
     </div>
