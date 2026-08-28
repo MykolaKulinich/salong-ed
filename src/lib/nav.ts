@@ -18,6 +18,7 @@ export const TREATMENT_LINKS: NavLink[] = [
   { label: "Kroppsbehandlingar", href: "/kroppsbehandlingar" },
   { label: "Ögonbehandlingar", href: "/behandlingar-ögon-område" },
   { label: "Fransar & naglar", href: "/fransar-naglar-ursvik" },
+  { label: "Laserhårborttagning", href: "/laserharborttagning-sundbyberg-ursvik" },
   { label: "Icoone LaserMed", href: "/icoone-lasermed-sundbyberg-ursvik" },
   { label: "Exilis Ultra 360", href: "/exilis-ultra-360-ursvik" },
   { label: "ScarNik Scar", href: "/scarnik-scar" },

@@ -157,6 +157,7 @@ export const FACE_PAGE: TreatmentPageData = {
     { title: "Ögonbehandlingar", href: ROUTES.eyes, description: "Behandlingar med fokus på huden runt ögonen." },
     { title: "Exilis Ultra 360", href: ROUTES.exilis, description: "En teknikbehandling med alternativ för ansikte." },
     { title: "Fransar & naglar", href: ROUTES.lashesAndNails, description: "Komplettera din stund med detaljer för blick och händer." },
+    { title: "Laserhårborttagning", href: ROUTES.laser, description: "Långvarig hårreduktion för bland annat ansikte och överläpp." },
   ],
 };
 
@@ -182,6 +183,7 @@ export const BODY_PAGE: TreatmentPageData = {
     { title: "Icoone LaserMed", href: ROUTES.icoone, description: "Läs om mikrostimulering och vakuumteknik." },
     { title: "Exilis Ultra 360", href: ROUTES.exilis, description: "Utforska en annan teknik för kropp och ansikte." },
     { title: "ScarNik Scar", href: ROUTES.scarnik, description: "Läs om arbete med ärrens utseende och komfort." },
+    { title: "Laserhårborttagning", href: ROUTES.laser, description: "Långvarig hårreduktion för ben, armhålor, bikini och fler områden." },
   ],
 };
 

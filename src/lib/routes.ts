@@ -9,6 +9,7 @@ export const ROUTES = {
   icoone: "/icoone-lasermed-sundbyberg-ursvik",
   giftCard: "/skönhet-presentkort-ursvik",
   scarnik: "/scarnik-scar",
+  laser: "/laserharborttagning-sundbyberg-ursvik",
 } as const;
 
 /** Protected Wix routes. Keep these exact paths stable during migration. */
