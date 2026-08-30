@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import PlausibleAnalytics from "@/components/analytics/PlausibleAnalytics";
 import "../globals.css";
 
 // A separate root layout (its own <html>/<body>) via the Next.js "multiple
@@ -22,7 +23,10 @@ export const metadata: Metadata = {
 export default function AdminRootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="sv" className="h-full antialiased">
-      <body className="min-h-full bg-background text-foreground">{children}</body>
+      <body className="min-h-full bg-background text-foreground">
+        {children}
+        <PlausibleAnalytics />
+      </body>
     </html>
   );
 }

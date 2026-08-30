@@ -7,9 +7,9 @@
  *   /sd/js/script.js -> https://plausible.io/js/pa-TLJKO1hs8OH95HzKUdyiV.js
  *   /sd/api/event    -> https://plausible.io/api/event
  *
- * The script itself is injected in `src/instrumentation-client.ts`, which
- * also installs the `window.plausible` queue stub. This module only knows
- * how to safely call it.
+ * The script itself is injected by the `PlausibleAnalytics` client component
+ * rendered from the root layouts, which also installs the `window.plausible`
+ * queue stub. This module only knows how to safely call it.
  *
  * Analytics must never run outside of production, and must never throw —
  * every guard below fails silently rather than affecting the application.
@@ -17,6 +17,7 @@
 
 export const PRODUCTION_HOSTNAME = "www.salongewelinadubowska.com";
 
+export const PLAUSIBLE_DOMAIN = "salongewelinadubowska.com";
 export const PLAUSIBLE_SCRIPT_SRC = "/sd/js/script.js";
 export const PLAUSIBLE_EVENT_ENDPOINT = "/sd/api/event";
 
@@ -42,6 +43,7 @@ export type AnalyticsEventName =
 export type AnalyticsEventProps = Record<string, string | number | boolean>;
 
 export type PlausibleInitOptions = {
+  domain?: string;
   endpoint?: string;
   [key: string]: unknown;
 };
