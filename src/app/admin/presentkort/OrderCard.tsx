@@ -19,12 +19,12 @@ export default function OrderCard({ order }: { order: GiftCardOrderRow }) {
             : "border-border bg-surface"
       }`}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+      <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
           <p className="font-serif text-xl text-foreground">{order.order_reference}</p>
           <p className="mt-1 text-xs text-muted">{formatOrderDateTime(order.created_at)}</p>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex shrink-0 flex-col items-end gap-2">
           <span
             className={`inline-flex items-center border px-2.5 py-1 text-xs font-medium ${STATUS_BADGE_CLASS[order.status]}`}
           >
@@ -35,29 +35,29 @@ export default function OrderCard({ order }: { order: GiftCardOrderRow }) {
       </div>
 
       <dl className="mt-4 grid gap-x-6 gap-y-2 border-t border-border pt-4 text-sm sm:grid-cols-2">
-        <div className="flex justify-between gap-4 sm:block">
+        <div className="min-w-0">
           <dt className="text-muted">Kund</dt>
-          <dd className="text-right text-foreground sm:text-left">{order.customer_name}</dd>
+          <dd className="mt-1 break-words text-foreground [overflow-wrap:anywhere] sm:mt-0">{order.customer_name}</dd>
         </div>
-        <div className="flex justify-between gap-4 sm:block">
+        <div className="min-w-0">
           <dt className="text-muted">Telefon</dt>
-          <dd className="text-right text-foreground sm:text-left">{order.customer_phone}</dd>
+          <dd className="mt-1 break-words text-foreground [overflow-wrap:anywhere] sm:mt-0">{order.customer_phone}</dd>
         </div>
-        <div className="flex justify-between gap-4 sm:block">
+        <div className="min-w-0">
           <dt className="text-muted">E-post</dt>
-          <dd className="truncate text-right text-foreground sm:text-left">{order.customer_email}</dd>
+          <dd className="mt-1 break-words text-foreground [overflow-wrap:anywhere] sm:mt-0">{order.customer_email}</dd>
         </div>
-        <div className="flex justify-between gap-4 sm:block">
+        <div className="min-w-0">
           <dt className="text-muted">Önskad behandling</dt>
-          <dd className="text-right text-foreground sm:text-left">{order.requested_treatment ?? "Ej angivet"}</dd>
+          <dd className="mt-1 break-words text-foreground [overflow-wrap:anywhere] sm:mt-0">{order.requested_treatment ?? "Ej angivet"}</dd>
         </div>
-        <div className="flex justify-between gap-4 sm:block">
+        <div className="min-w-0">
           <dt className="text-muted">Mottagare</dt>
-          <dd className="text-right text-foreground sm:text-left">{order.recipient_name ?? "Inte angivet"}</dd>
+          <dd className="mt-1 break-words text-foreground [overflow-wrap:anywhere] sm:mt-0">{order.recipient_name ?? "Inte angivet"}</dd>
         </div>
-        <div className="flex justify-between gap-4 sm:block">
+        <div className="min-w-0">
           <dt className="text-muted">Levereras till</dt>
-          <dd className="truncate text-right text-foreground sm:text-left">{formatDeliveryDestination(order)}</dd>
+          <dd className="mt-1 break-words text-foreground [overflow-wrap:anywhere] sm:mt-0">{formatDeliveryDestination(order)}</dd>
         </div>
       </dl>
     </Link>

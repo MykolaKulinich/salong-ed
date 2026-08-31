@@ -50,12 +50,12 @@ export default function ResendDeliveryButton({ orderId }: { orderId: string }) {
   return (
     <div className="border border-accent/50 bg-[#f5eee5] p-5">
       <p className="text-sm text-foreground">Vill du skicka presentkortet igen?</p>
-      <div className="mt-4 flex flex-wrap gap-3">
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <button
           type="button"
           onClick={() => setStep("idle")}
           disabled={isPending}
-          className="min-h-11 border border-border px-5 text-sm text-foreground transition-colors hover:border-foreground disabled:opacity-60"
+          className="min-h-11 w-full border border-border px-5 text-sm text-foreground transition-colors hover:border-foreground disabled:opacity-60 sm:w-auto"
         >
           Avbryt
         </button>
@@ -63,7 +63,7 @@ export default function ResendDeliveryButton({ orderId }: { orderId: string }) {
           type="button"
           onClick={handleResend}
           disabled={isPending}
-          className="min-h-11 bg-foreground px-5 text-sm font-medium text-background transition-colors hover:bg-accent-strong disabled:opacity-60"
+          className="min-h-11 w-full bg-foreground px-5 text-sm font-medium text-background transition-colors hover:bg-accent-strong disabled:opacity-60 sm:w-auto"
         >
           {isPending ? "Skickar…" : "Skicka igen"}
         </button>

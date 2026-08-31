@@ -42,15 +42,15 @@ export default async function PresentkortOrderPage({
   }
 
   return (
-    <div className="max-w-2xl">
+    <div className="min-w-0 max-w-2xl">
       <Link href="/admin/presentkort" className="text-sm text-muted transition-colors hover:text-accent">
         ← Alla beställningar
       </Link>
 
-      <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-        <h2 className="font-serif text-3xl text-foreground">{order.order_reference}</h2>
+      <div className="mt-5 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
+        <h2 className="break-words font-serif text-3xl text-foreground [overflow-wrap:anywhere]">{order.order_reference}</h2>
         <span
-          className={`inline-flex items-center border px-3 py-1 text-sm font-medium ${STATUS_BADGE_CLASS[order.status]}`}
+          className={`inline-flex shrink-0 items-center border px-3 py-1 text-sm font-medium ${STATUS_BADGE_CLASS[order.status]}`}
         >
           {GIFT_CARD_STATUS_LABELS[order.status]}
         </span>
@@ -58,24 +58,26 @@ export default async function PresentkortOrderPage({
 
       <dl className="mt-6 divide-y divide-border border-y border-border">
         {fields.map((field) => (
-          <div key={field.label} className="flex items-start justify-between gap-6 py-3 text-sm">
+          <div key={field.label} className="min-w-0 py-3 text-sm sm:flex sm:items-start sm:justify-between sm:gap-6">
             <dt className="text-muted">{field.label}</dt>
-            <dd className="max-w-xs text-right text-foreground">{field.value}</dd>
+            <dd className="mt-1 break-words text-foreground [overflow-wrap:anywhere] sm:mt-0 sm:max-w-xs sm:text-right">
+              {field.value}
+            </dd>
           </div>
         ))}
-        <div className="flex items-start justify-between gap-6 py-3 text-sm">
+        <div className="min-w-0 py-3 text-sm sm:flex sm:items-start sm:justify-between sm:gap-6">
           <dt className="text-muted">Hälsning</dt>
-          <dd className="max-w-xs whitespace-pre-wrap text-right text-foreground">
+          <dd className="mt-1 max-w-none break-words whitespace-pre-wrap text-foreground [overflow-wrap:anywhere] sm:mt-0 sm:max-w-xs sm:text-right">
             {order.message ?? "Ingen hälsning"}
           </dd>
         </div>
       </dl>
 
       {(order.status === "waiting_payment" || order.status === "paid") && (
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <Link
             href={`/admin/presentkort/${order.id}/redigera`}
-            className="inline-flex min-h-11 items-center border border-border px-5 text-sm text-foreground transition-colors hover:border-foreground"
+            className="inline-flex min-h-11 items-center justify-center border border-border px-5 text-sm text-foreground transition-colors hover:border-foreground"
           >
             Redigera beställning
           </Link>
