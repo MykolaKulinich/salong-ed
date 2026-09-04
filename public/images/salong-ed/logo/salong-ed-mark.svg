@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" role="img" aria-label="Salong ED">
+  <title>Salong ED</title>
+  <rect width="44" height="44" fill="#faf7f2"/>
+  <rect x="0.5" y="0.5" width="43" height="43" fill="rgba(169, 138, 92, 0.05)" stroke="rgba(169, 138, 92, 0.8)" stroke-width="1"/>
+  <text x="22" y="28" text-anchor="middle" font-family="Georgia, 'Times New Roman', Times, serif" font-size="16" fill="#a98a5c" style="letter-spacing:0.04em">ED</text>
+  <rect x="43" y="8" width="2" height="16" fill="#faf7f2"/>
+</svg>
